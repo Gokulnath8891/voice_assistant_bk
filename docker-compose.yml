@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  voice-api:
+    build: .
+    container_name: voice-assistant-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - AZURE_SPEECH_KEY=${AZURE_SPEECH_KEY}
+      - AZURE_SPEECH_REGION=${AZURE_SPEECH_REGION}
+      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - CHATGPT_MODEL=${CHATGPT_MODEL}
+      - VECTOR_STORE_PATH=./my_vector_db
+      - VECTOR_COLLECTION_NAME=${VECTOR_COLLECTION_NAME}
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-change-this-in-production}
+    volumes:
+      - ./my_vector_db:/app/my_vector_db
+      - ./tesla_db:/app/tesla_db
+      - ./pdf_docs:/app/pdf_docs
+      - voice_logs:/app/logs
+    networks:
+      - voice-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  voice_logs:
+    driver: local
+
+networks:
+  voice-network:
+    driver: bridge

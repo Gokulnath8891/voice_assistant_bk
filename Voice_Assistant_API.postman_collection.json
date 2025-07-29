@@ -1,0 +1,446 @@
+{
+  "info": {
+    "name": "Voice Assistant API",
+    "description": "Complete API collection for Voice Assistant endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Wake Word Control",
+      "item": [
+        {
+          "name": "Start Wake Word Detection",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/wakeword/start",
+              "host": ["{{base_url}}"],
+              "path": ["wakeword", "start"]
+            },
+            "description": "Start continuous wake word detection for 'hey buddy'"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/wakeword/start",
+                  "host": ["{{base_url}}"],
+                  "path": ["wakeword", "start"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Wake word detection started\",\n  \"wake_word\": \"hey buddy\",\n  \"listening\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Stop Wake Word Detection",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/wakeword/stop",
+              "host": ["{{base_url}}"],
+              "path": ["wakeword", "stop"]
+            },
+            "description": "Stop wake word detection"
+          }
+        },
+        {
+          "name": "Get Wake Word Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/wakeword/status",
+              "host": ["{{base_url}}"],
+              "path": ["wakeword", "status"]
+            },
+            "description": "Get current status and recent wake word detections"
+          },
+          "response": [
+            {
+              "name": "Status with Detections",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/wakeword/status",
+                  "host": ["{{base_url}}"],
+                  "path": ["wakeword", "status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"listening\": true,\n  \"wake_word\": \"hey buddy\",\n  \"detection_count\": 2,\n  \"recent_detections\": [\n    {\n      \"timestamp\": 1703123456.789,\n      \"wake_word_detected\": true,\n      \"full_text\": \"Hey buddy, how does the airbag work?\",\n      \"command_text\": \"how does the airbag work\",\n      \"confidence\": 0.95\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Process Wake Word Command",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command_text\": \"how does the airbag work\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/wakeword/process",
+              "host": ["{{base_url}}"],
+              "path": ["wakeword", "process"]
+            },
+            "description": "Process a wake word command through the complete pipeline"
+          },
+          "response": [
+            {
+              "name": "Successful Processing",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"command_text\": \"how does the airbag work\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/wakeword/process",
+                  "host": ["{{base_url}}"],
+                  "path": ["wakeword", "process"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"command_text\": \"how does the airbag work\",\n  \"summary\": \"• Airbags are safety devices that inflate rapidly during a collision\\n• They use sodium azide as the inflating agent\\n• Sensors detect rapid deceleration and trigger deployment\",\n  \"relevant_chunks\": [\n    {\n      \"content\": \"Airbags are inflatable safety devices...\",\n      \"metadata\": {\n        \"source\": \"automotive_safety.pdf\",\n        \"chunk_index\": 5\n      },\n      \"similarity_score\": 0.89\n    }\n  ],\n  \"wake_word_triggered\": true\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Wake word detection endpoints for hands-free voice activation"
+    },
+    {
+      "name": "Speech Recognition",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "audio",
+              "type": "file",
+              "src": "",
+              "description": "Upload an audio file (WAV, MP3, FLAC)"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/speech/recognize",
+          "host": ["{{base_url}}"],
+          "path": ["speech", "recognize"]
+        },
+        "description": "Convert audio file to text using Azure Speech Services"
+      },
+      "response": [
+        {
+          "name": "Successful Recognition",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": "sample.wav"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/speech/recognize",
+              "host": ["{{base_url}}"],
+              "path": ["speech", "recognize"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"status\": \"success\",\n  \"recognized_text\": \"How does the airbag work?\",\n  \"confidence_score\": 0.95,\n  \"processing_time_ms\": 1250\n}"
+        }
+      ]
+    },
+    {
+      "name": "Semantic Search",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"How does the airbag work?\",\n  \"max_chunks\": 5,\n  \"similarity_threshold\": 0.7\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/search/query",
+          "host": ["{{base_url}}"],
+          "path": ["search", "query"]
+        },
+        "description": "Search through document knowledge base and get AI-generated summaries"
+      },
+      "response": [
+        {
+          "name": "Successful Search",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"How does the airbag work?\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/search/query",
+              "host": ["{{base_url}}"],
+              "path": ["search", "query"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"status\": \"success\",\n  \"query\": \"How does the airbag work?\",\n  \"summary\": \"• Airbags are safety devices that inflate rapidly during a collision\\n• They use sodium azide as the inflating agent\\n• Sensors detect rapid deceleration and trigger deployment\\n• The airbag inflates within 30 milliseconds of impact\",\n  \"relevant_chunks\": [\n    {\n      \"content\": \"Airbags are inflatable safety devices designed to protect vehicle occupants during a collision...\",\n      \"metadata\": {\n        \"source\": \"automotive_safety.pdf\",\n        \"chunk_index\": 5\n      },\n      \"similarity_score\": 0.89\n    }\n  ],\n  \"processing_time_ms\": 850\n}"
+        }
+      ]
+    },
+    {
+      "name": "Text-to-Speech",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"The airbag system uses sensors to detect collisions and deploy within milliseconds.\",\n  \"voice_settings\": {\n    \"rate\": 150,\n    \"volume\": 0.8,\n    \"voice\": \"default\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/tts/synthesize",
+          "host": ["{{base_url}}"],
+          "path": ["tts", "synthesize"]
+        },
+        "description": "Convert text to speech audio using pyttsx3"
+      },
+      "response": [
+        {
+          "name": "Successful TTS",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Hello world\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tts/synthesize",
+              "host": ["{{base_url}}"],
+              "path": ["tts", "synthesize"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "audio/wav"
+            },
+            {
+              "key": "Content-Disposition",
+              "value": "inline; filename=\"speech.wav\""
+            }
+          ],
+          "body": "[Binary audio data]"
+        }
+      ]
+    },
+    {
+      "name": "Complete Pipeline Test",
+      "item": [
+        {
+          "name": "1. Speech Recognition",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/speech/recognize",
+              "host": ["{{base_url}}"],
+              "path": ["speech", "recognize"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Store recognized text for next request",
+                  "const response = pm.response.json();",
+                  "if (response.status === 'success') {",
+                  "    pm.globals.set('recognized_text', response.recognized_text);",
+                  "    console.log('Recognized text:', response.recognized_text);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Semantic Search",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{{recognized_text}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/search/query",
+              "host": ["{{base_url}}"],
+              "path": ["search", "query"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Store summary for TTS",
+                  "const response = pm.response.json();",
+                  "if (response.status === 'success') {",
+                  "    pm.globals.set('summary_text', response.summary);",
+                  "    console.log('Summary:', response.summary);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Text-to-Speech",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"{{summary_text}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tts/synthesize",
+              "host": ["{{base_url}}"],
+              "path": ["tts", "synthesize"]
+            }
+          }
+        }
+      ],
+      "description": "Complete pipeline: Audio → Text → Search → Summary → Audio"
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/admin/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["admin", ""]
+        },
+        "description": "Check if the server is running"
+      }
+    }
+  ]
+}

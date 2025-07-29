@@ -1,0 +1,253 @@
+openapi: 3.0.0
+info:
+  title: Voice Assistant API
+  description: |
+    A comprehensive voice assistant API that provides speech recognition, semantic search, 
+    and text-to-speech capabilities using Azure services and local processing.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@voiceassistant.com
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+
+paths:
+  /speech/recognize:
+    post:
+      summary: Speech Recognition
+      description: Convert audio files to text using Azure Speech Services
+      tags:
+        - Speech Recognition
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                  description: Audio file (WAV, MP3, FLAC)
+              required:
+                - audio
+      responses:
+        '200':
+          description: Speech recognition successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  recognized_text:
+                    type: string
+                    example: "How does the airbag work?"
+                  confidence_score:
+                    type: number
+                    format: float
+                    example: 0.95
+                  processing_time_ms:
+                    type: integer
+                    example: 1250
+        '400':
+          description: Bad request - missing audio file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /search/query:
+    post:
+      summary: Semantic Search
+      description: Search through document knowledge base and get AI-generated summaries
+      tags:
+        - Semantic Search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: Search query text
+                  example: "How does the airbag work?"
+                max_chunks:
+                  type: integer
+                  description: Maximum number of document chunks to retrieve
+                  default: 5
+                  minimum: 1
+                  maximum: 10
+                similarity_threshold:
+                  type: number
+                  format: float
+                  description: Minimum similarity score (0.0-1.0)
+                  default: 0.7
+                  minimum: 0.0
+                  maximum: 1.0
+              required:
+                - query
+      responses:
+        '200':
+          description: Search successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  query:
+                    type: string
+                    example: "How does the airbag work?"
+                  summary:
+                    type: string
+                    example: "• Airbags are safety devices that inflate rapidly during a collision"
+                  relevant_chunks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DocumentChunk'
+                  processing_time_ms:
+                    type: integer
+                    example: 850
+        '400':
+          description: Bad request - missing query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tts/synthesize:
+    post:
+      summary: Text-to-Speech
+      description: Convert text to speech audio using pyttsx3
+      tags:
+        - Text-to-Speech
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  description: Text to convert to speech
+                  example: "The airbag system uses sensors to detect collisions."
+                voice_settings:
+                  $ref: '#/components/schemas/VoiceSettings'
+              required:
+                - text
+      responses:
+        '200':
+          description: Text-to-speech conversion successful
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: 'inline; filename="speech.wav"'
+            Content-Length:
+              schema:
+                type: integer
+        '400':
+          description: Bad request - missing text
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: "Error description"
+
+    DocumentChunk:
+      type: object
+      properties:
+        content:
+          type: string
+          description: Document content
+          example: "Airbags are inflatable safety devices..."
+        metadata:
+          type: object
+          properties:
+            source:
+              type: string
+              example: "automotive_safety.pdf"
+            chunk_index:
+              type: integer
+              example: 5
+        similarity_score:
+          type: number
+          format: float
+          example: 0.89
+
+    VoiceSettings:
+      type: object
+      properties:
+        rate:
+          type: integer
+          description: Speech rate (50-300 words per minute)
+          default: 150
+          minimum: 50
+          maximum: 300
+        volume:
+          type: number
+          format: float
+          description: Volume level (0.0-1.0)
+          default: 0.8
+          minimum: 0.0
+          maximum: 1.0
+        voice:
+          type: string
+          description: Voice type
+          default: default
+          enum:
+            - default
+            - male
+            - female
+
+tags:
+  - name: Speech Recognition
+    description: Convert audio to text
+  - name: Semantic Search
+    description: Search knowledge base and generate summaries
+  - name: Text-to-Speech
+    description: Convert text to audio
